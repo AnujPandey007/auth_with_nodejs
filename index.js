@@ -1,5 +1,7 @@
 // Imports
 const express = require('express');
+const bodyParser = require('body-parser');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -51,10 +53,12 @@ app.use(express.json());
 app.use('/css', express.static(__dirname + 'public/css'));
 app.use('/js', express.static(__dirname + 'public/js'));
 app.use('/img', express.static(__dirname + 'public/img'));
+app.use(bodyParser.urlencoded({ extended : true }));
 
 // Set Views
 app.set('views', './views');
 app.set('view engine', 'ejs');
+
 
 app.get('', (req, res) => {
     res.render('index', {sanskrit: abouts[0].sanskrit, hindi: abouts[0].hindi});
