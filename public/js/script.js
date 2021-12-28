@@ -63,7 +63,7 @@ function rotateImageFunction(){
 getApi();
 
 async function getApi() {
-    fetch("https://authjs.herokuapp.com/about/getAll").then(function (response) {
+    fetch("http://localhost:3000/about/getAll").then(function (response) {
         return response.json();
     }).then(function (data) {
         appendData(data);

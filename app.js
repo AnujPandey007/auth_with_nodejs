@@ -1,13 +1,9 @@
 // Imports
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const mysql = require('mysql');
 const app = express();
-const port = process.env.PORT || 3000;
-
-// const scriptFile = require("../First Web App/public/js/script.js");
-// console.log(scriptFile.adminName);
-// console.log(scriptFile.getAvg([1,5]));
+const port = /*process.env.PORT ||*/ 3000;
 
 const abouts = [
     {
@@ -59,13 +55,134 @@ app.use(bodyParser.urlencoded({ extended : true }));
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-
 app.get('', (req, res) => {
     res.render('index', {sanskrit: abouts[0].sanskrit, hindi: abouts[0].hindi});
 });
 
 app.get('/about', (req, res) => {
     res.render('about', { text: 'About Page'});
+});
+
+//CREATE CONNECTION
+const db = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    port: 3306,
+    database: 'authjs'
+  });
+
+//CONNECT
+db.connect((err)=>{
+    if(err){
+        throw err;
+    }
+    console.log("My SQL is connected");
+});
+
+//Create db
+app.get('/createdb', (req, res)=> {
+    let sql = 'CREATE DATABASE authjs';
+    db.query(sql, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('Database Created');
+    });
+});
+
+//create table
+app.get('/createposttable', (req, res)=>{
+    let sql = 'CREATE TABLE posts(id INT AUTO_INCREMENT PRIMARY KEY,  title VARCHAR(255), body VARCHAR(255))';
+    db.query(sql, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('table Created');
+    });
+});
+
+//insert post 1
+app.get('/addpost1', (req, res)=>{
+    let post  = {
+        title: "post one",
+        body: "this is post one"
+    };
+    let sql = "INSERT INTO posts SET ?";
+    db.query(sql, post, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('post 1 added');
+    });
+});
+
+//insert post 2
+app.get('/addpost2', (req, res)=>{
+    let post  = {
+        title: "post two",
+        body: "this is post two"
+    };
+    let sql = "INSERT INTO posts SET ?";
+    db.query(sql, post, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('post 2 added');
+    });
+});
+
+//select posts
+app.get('/getposts', (req, res)=>{
+    let sql = "SELECT * FROM posts";
+    db.query(sql, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('fetched data');
+    });
+});
+
+//select post
+app.get('/getpost/:id', (req, res)=>{
+    let sql = `SELECT * FROM posts WHERE id=${req.params.id}`;
+    db.query(sql, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('fetched data');
+    });
+});
+
+//update post
+app.get('/updatepost/:id', (req, res)=>{
+    let newTitle = "Updated Title";
+    let sql = `UPDATE posts SET title = '${newTitle}' WHERE id=${req.params.id}`;
+    db.query(sql, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('updated the data');
+    });
+});
+
+//delete post
+app.get('/deletepost/:id', (req, res)=>{
+    let sql = `DELETE FROM posts WHERE id=${req.params.id}`;
+    db.query(sql, (err, result)=>{
+        if(err){
+            throw err;
+        }
+        console.log(result);
+        res.send('deleted the data');
+    });
 });
 
 //API 
