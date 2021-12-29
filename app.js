@@ -29,10 +29,27 @@ app.get('/select/:id', (req, res)=>{
     });
 });
 
+//For checking if a variable is falsey or if the string only contains whitespace or is empty, I use:
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
+
 app.post('/insert', (req, res)=>{
+    if(isBlank(req.body.firstName) || isBlank(req.body.lastName)){
+        res.status(404).json("Name Cant be blank.");
+        return;
+    }
+
+    if(!req.body.userAge || req.body.userAge <= 10){
+        res.status(404).json("Age Should be more than 10+.");
+        return;
+    }
     User.create({
         firstName: req.body.firstName,
-        age: req.body.age
+        lastName: req.body.lastName,
+        userEmail: req.body.userEmail,
+        userPassword: req.body.userPassword,
+        userAge: req.body.userAge
     }).catch(err => {
         if(err){
             throw err;
@@ -44,10 +61,16 @@ app.post('/insert', (req, res)=>{
 
 app.put('/update/:id', (req, res)=>{
     User.findByPk(req.params.id).then(function(user) {
-        console.log(req.body.firstName);
+        if(!req.body.userAge || req.body.userAge <= 10){
+            res.status(404).json("Age Should be more than 10+.");
+            return;
+        }
         user.update({
             firstName: req.body.firstName,
-            age: req.body.age
+            lastName: req.body.lastName,
+            userEmail: req.body.userEmail,
+            userPassword: req.body.userPassword,
+            userAge: req.body.userAge
         }).catch(err => {
             if(err){
                 throw err;
